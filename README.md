@@ -390,13 +390,3 @@ R : Utilise le stub (voir section 10) pour simuler la réponse et tester l'UI.
 
 ---
 
-Si tu veux, je peux :
-
-* fournir le code complet prêt à coller dans des fichiers (je peux générer les fichiers séparés),
-* ou te donner un `docker-compose.yml` pour exécuter tout en local.
-
-Dis-moi si tu veux que je génère maintenant les fichiers prêts à copier-coller (backend + frontend) ou un `docker-compose`.
-
----
-
-*Fin du document.*
