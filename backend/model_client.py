@@ -3,16 +3,14 @@ from PIL import Image
 
 class ShifumiModel:
     def __init__(self):
-        # Chemin vers ton modèle local
+        # Charge ton modèle YOLO
         self.model = YOLO("backend/models/best.pt")
 
-    def predict_image(self, pil_image: Image.Image):
-        results = self.model(pil_image)
-        if results and len(results) > 0:
-            best = results[0]
-            if best.boxes is not None and len(best.boxes) > 0:
-                cls_id = int(best.boxes.cls[0])
-                label = best.names[cls_id]  # pierre / feuille / ciseaux
-                score = float(best.boxes.conf[0])
-                return label, score
-        return "inconnu", 0.0
+    def predict(self, image: Image.Image):
+        # Prédit le geste sur une image PIL
+        results = self.model.predict(image)
+        if results and len(results[0].boxes) > 0:
+            cls_id = int(results[0].boxes.cls[0])
+            classes_map = {0: "pierre", 1: "papier", 2: "ciseaux"}
+            return classes_map.get(cls_id, "inconnu")
+        return "inconnu"
