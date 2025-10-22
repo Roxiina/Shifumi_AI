@@ -1,72 +1,58 @@
-# backend/main.py
-# Serveur FastAPI simple qui reçoit une image base64, appelle HF et renvoie la prédiction
-
-
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import base64
-import io
 from PIL import Image
-import random
-from model_client import HFModelClient
-
+import io, base64, random
+from backend.model_client import ShifumiModel  # import correct
 
 app = FastAPI()
 
+# CORS pour autoriser le frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Instancie le client HF (KEY via variable d'environnement)
-hf = HFModelClient()
+# Instance du modèle
+model = ShifumiModel()
 
-
+# Classe pour le POST JSON
 class PredictRequest(BaseModel):
-image_base64: str # data URI ou base64 sans header
+    image_base64: str
 
-
-@app.post('/predict')
+@app.post("/predict")
 async def predict(req: PredictRequest):
-try:
-# retirer le préfixe data:image/png;base64, s'il existe
-b = req.image_base64
-if b.startswith('data:'):
-b = b.split(',', 1)[1]
-img_bytes = base64.b64decode(b)
-img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
-except Exception as e:
-raise HTTPException(status_code=400, detail=f"image decode error: {e}")
+    try:
+        b64 = req.image_base64
+        if b64.startswith("data:"):
+            b64 = b64.split(",", 1)[1]
+        img_bytes = io.BytesIO(base64.b64decode(b64))
+        img = Image.open(img_bytes).convert("RGB")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Erreur décodage image: {e}")
 
+    user_gesture, score = model.predict_image(img)
+    choices = ["pierre", "feuille", "ciseaux"]
+    server_choice = random.choice(choices)
+    result = compute_result(user_gesture, server_choice)
 
-# Appel du modèle HF
-pred_label, score = hf.predict_image(img)
-
-
-# Serveur choisit un geste aléatoire
-choices = ['pierre', 'feuille', 'ciseaux']
-server_choice = random.choice(choices)
-
-
-# calcule le résultat
-result = compute_result(pred_label, server_choice)
-
-
-return {
-'user': pred_label,
-'score': float(score),
-'server': server_choice,
-'result': result
-}
-
-
-
+    return {
+        "user": user_gesture,
+        "score": float(score),
+        "server": server_choice,
+        "result": result
+    }
 
 def compute_result(user, server):
-if user == server:
-return 'egalite'
-wins = {
-'pierre': 'ciseaux',
-'ciseaux': 'feuille',
-'feuille': 'pierre'
-}
-if wins.get(user) == server:
-return 'gagne'
-else:
-return 'perdu'
+    if user == server:
+        return "egalite"
+    wins = {"pierre":"ciseaux","ciseaux":"feuille","feuille":"pierre"}
+    return "gagne" if wins.get(user) == server else "perdu"
+
+# Endpoint test minimal
+@app.get("/")
+def read_root():
+    return {"message": "Shifumi AI fonctionne !"}
