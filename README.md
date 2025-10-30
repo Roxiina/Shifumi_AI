@@ -62,13 +62,15 @@ python shifumi_webcam.py
 
 ```
 Shifumi_AI/
-├── shifumi_webcam.py     # Programme principal
-├── game_logic.py         # Logique du jeu
-├── models/
-│   └── best.pt          # Modèle YOLOv5 entraîné
-├── test/
-│   └── test_game.py     # Tests unitaires
-└── requirements.txt      # Dépendances Python
+├── shifumi_webcam.py     # Programme principal du jeu
+├── game_logic.py         # Logique du jeu (détection des gestes et règles)
+├── requirements.txt      # Liste des dépendances Python
+├── README.md            # Documentation d'installation et d'utilisation
+├── FEEDBACK.md          # Retour d'expérience et améliorations futures
+├── scores.json          # Historique des scores (généré automatiquement)
+├── .venv/              # Environnement virtuel Python
+└── test/
+    └── test_game.py    # Tests unitaires
 ```
 
 ## 🧪 Tests
