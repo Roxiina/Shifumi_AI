@@ -1,12 +1,27 @@
 # 📊 Retour d'Expérience - Projet Shifumi AI
 
-## 🎯 Objectifs du projet
+## 🎯 Objectifs du Projet et Réalisations
 
-L'objectif était de créer une version interactive du jeu Pierre-Feuille-Ciseaux utilisant l'intelligence artificielle pour :
-1. Détecter les mains en temps réel
-2. Reconnaître les gestes du joueur
-3. Créer une interface utilisateur intuitive
-4. Implémenter la logique du jeu
+### Objectifs Initiaux (Cahier des Charges)
+1. **Stand Interactif :**
+   - ✅ Création d'une expérience ludique et engageante
+   - ✅ Interface intuitive adaptée aux événements
+   - ✅ Performance optimale sur ordinateurs standards
+
+2. **Détection et IA :**
+   - ✅ Reconnaissance en temps réel des gestes
+   - ✅ Traitement local sans stockage vidéo (RGPD)
+   - ✅ Réponses fluides et naturelles
+
+3. **Système de Score :**
+   - ✅ Suivi des parties et des résultats
+   - ✅ Stockage local sécurisé
+   - ✅ Interface de score claire
+
+### Évolutions par Rapport au MVP
+- **Architecture :** Application native Python plutôt que web
+- **Stockage :** JSON local plutôt que base de données SQL
+- **Interface :** OpenCV direct plutôt que framework web
 
 ## ✨ Points forts
 
