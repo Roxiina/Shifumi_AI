@@ -131,6 +131,11 @@ def reset_game_api():
     reset_game()
     return jsonify({'status': 'success', 'game_state': game_state})
 
+@app.route('/reset', methods=['POST'])
+def reset_game_route():
+    reset_game()
+    return jsonify(game_state)
+
 @app.route('/play', methods=['POST'])
 def play():
     global game_state

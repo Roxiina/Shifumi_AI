@@ -53,6 +53,15 @@ h1 {
     to { text-shadow: 2px 2px 20px rgba(255,255,255,0.5); }
 }
 
+/* Layout avec 3 panneaux */
+.game-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
 .game-board {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 30px;
@@ -62,6 +71,305 @@ h1 {
     border: 1px solid rgba(255,255,255,0.3);
     position: relative;
     overflow: hidden;
+}
+
+/* Panel historique */
+.history-panel {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.3);
+    height: fit-content;
+    min-height: 600px;
+}
+
+.history-panel h3 {
+    color: #2d3436;
+    font-size: 1.4em;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px solid #74b9ff;
+    padding-bottom: 10px;
+}
+
+/* Panel des gestes détectés */
+.gestures-panel {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.3);
+    height: fit-content;
+    min-height: 600px;
+}
+
+.gestures-header h3 {
+    color: #2d3436;
+    font-size: 1.4em;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px solid #e17055;
+    padding-bottom: 10px;
+}
+
+.current-detection,
+.gesture-detection,
+.last-round-gestures {
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid rgba(225, 112, 85, 0.3);
+    transition: all 0.3s ease;
+}
+
+.detection-label {
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detected-hand {
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #fd79a8, #e84393);
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+}
+
+.hand-status {
+    font-size: 1.1em;
+}
+
+.current-gesture-display {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #00b894, #00a085);
+    border-radius: 12px;
+    color: white;
+}
+
+.gesture-emoji {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.gesture-name {
+    font-size: 1.2em;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.round-comparison {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.player-gesture-choice,
+.computer-gesture-choice {
+    text-align: center;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(116, 185, 255, 0.2);
+    border: 2px solid #74b9ff;
+}
+
+.choice-label {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.choice-emoji {
+    font-size: 2.5em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.choice-name {
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #2d3436;
+}
+
+.vs-indicator {
+    font-size: 1.2em;
+    font-weight: 800;
+    color: #e17055;
+    text-align: center;
+    background: rgba(225, 112, 85, 0.1);
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.round-result {
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.round-result.player-win {
+    background: linear-gradient(135deg, #00b894, #00a085);
+    color: white;
+}
+
+.round-result.computer-win {
+    background: linear-gradient(135deg, #e17055, #d63031);
+    color: white;
+}
+
+.round-result.draw {
+    background: linear-gradient(135deg, #fdcb6e, #e17055);
+    color: white;
+}
+
+.history-stats {
+    margin-bottom: 25px;
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+}
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.stat:last-child {
+    margin-bottom: 0;
+}
+
+.stat-label {
+    font-size: 0.9em;
+}
+
+.stat-value {
+    font-size: 1.1em;
+    font-weight: 700;
+}
+
+.history-list {
+    max-height: 450px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.history-placeholder {
+    text-align: center;
+    color: #636e72;
+    font-style: italic;
+    padding: 30px 0;
+}
+
+.history-item {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.history-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.history-item.player-win {
+    border-left-color: #00b894;
+    background: linear-gradient(135deg, #d1f2eb, #a8e6cf);
+}
+
+.history-item.computer-win {
+    border-left-color: #e17055;
+    background: linear-gradient(135deg, #fadbd8, #f1948a);
+}
+
+.history-item.draw {
+    border-left-color: #ffeaa7;
+    background: linear-gradient(135deg, #fef9e7, #fcf3cf);
+}
+
+.round-number {
+    font-weight: 700;
+    color: #2d3436;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.round-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.gestures {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.round-result {
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.round-result.player-win {
+    color: #00b894;
+}
+
+.round-result.computer-win {
+    color: #e17055;
+}
+
+.round-result.draw {
+    color: #f39c12;
+}
+
+/* Scrollbar personnalisée pour l'historique */
+.history-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.history-list::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border-radius: 10px;
+}
+
+.history-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #0984e3, #74b9ff);
 }
 
 .game-board::before {
@@ -191,30 +499,115 @@ h1 {
     font-size: 0.9em;
 }
 
-.gesture-info {
-    margin: 20px 0;
+.current-round-info {
+    margin: 25px 0;
     text-align: center;
 }
 
-.current-gesture, .gesture-feedback {
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 1.1em;
+.round-battle {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border: 2px solid rgba(116, 185, 255, 0.3);
+}
+
+.battle-gesture {
+    text-align: center;
+}
+
+.battle-label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.battle-display {
+    background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid rgba(196, 181, 253, 0.5);
     transition: all 0.3s ease;
 }
 
-.current-gesture {
-    background: linear-gradient(135deg, #74b9ff, #0984e3);
-    color: white;
-    box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+.battle-emoji {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 8px;
 }
 
-.gesture-feedback {
-    background: linear-gradient(135deg, #55a3ff, #74b9ff);
+.battle-name {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #2d3436;
+    text-transform: capitalize;
+}
+
+.player-battle .battle-display {
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border-color: rgba(116, 185, 255, 0.5);
+}
+
+.player-battle .battle-name {
     color: white;
-    box-shadow: 0 4px 15px rgba(85, 163, 255, 0.3);
+}
+
+.computer-battle .battle-display {
+    background: linear-gradient(135deg, #fd79a8, #e84393);
+    border-color: rgba(253, 121, 168, 0.5);
+}
+
+.computer-battle .battle-name {
+    color: white;
+}
+
+.battle-vs {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.vs-text {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: #e17055;
+    background: rgba(225, 112, 85, 0.1);
+    padding: 12px 20px;
+    border-radius: 50px;
+    border: 2px solid rgba(225, 112, 85, 0.3);
+}
+
+.battle-result {
+    background: linear-gradient(135deg, #00b894, #00a085);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 1em;
+    min-width: 150px;
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+    transition: all 0.3s ease;
+}
+
+.battle-result.player-win {
+    background: linear-gradient(135deg, #00b894, #00a085);
+}
+
+.battle-result.computer-win {
+    background: linear-gradient(135deg, #e17055, #d63031);
+}
+
+.battle-result.draw {
+    background: linear-gradient(135deg, #fdcb6e, #e17055);
 }
 
 .play-button {
@@ -253,6 +646,32 @@ h1 {
     50% { 
         box-shadow: 0 12px 40px rgba(0, 184, 148, 0.7);
     }
+}
+
+.stop-button {
+    font-size: 1.4em;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #e17055, #d63031);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 10px auto;
+    display: block;
+    box-shadow: 0 6px 16px rgba(225, 112, 85, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stop-button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 45px rgba(225, 112, 85, 0.6);
+    background: linear-gradient(45deg, #d63031, #e17055);
+}
+
+.controls {
+    text-align: center;
+    margin: 25px 0;
 }
 
 .game-status {
@@ -322,6 +741,47 @@ h1 {
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+    .game-layout {
+        grid-template-columns: 1fr 2fr;
+        gap: 15px;
+    }
+    
+    .gestures-panel {
+        order: -1;
+        min-height: auto;
+        max-height: 500px;
+    }
+    
+    .history-panel {
+        min-height: auto;
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .game-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .gestures-panel {
+        order: -1;
+        min-height: auto;
+        max-height: 400px;
+    }
+    
+    .history-panel {
+        order: 2;
+        min-height: auto;
+        max-height: 400px;
+    }
+    
+    .history-list {
+        max-height: 250px;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -335,6 +795,16 @@ h1 {
     .game-board {
         padding: 20px;
         margin: 10px;
+    }
+    
+    .history-panel {
+        padding: 15px;
+        margin: 10px;
+    }
+
+    .scores {
+        flex-direction: column;
+        gap: 15px;
     }
 
     .scores {

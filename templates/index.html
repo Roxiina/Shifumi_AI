@@ -16,49 +16,148 @@
             <h1 class="title">🎮 Shifumi AI</h1>
         </div>
 
-        <div class="game-board">
-            <div class="scores">
-                <div class="score-card player-score">
-                    <div class="score-label">👤 Vous</div>
-                    <div class="score-number" id="player-score">0</div>
-                </div>
-                <div class="score-card computer-score">
-                    <div class="score-label">🤖 IA</div>
-                    <div class="score-number" id="computer-score">0</div>
-                </div>
-            </div>
-
-            <div id="game-status" class="game-status">Premier à 5 points gagne !</div>
-            <div id="round-info" class="round-info">Faites votre geste devant la caméra...</div>
-
-            <div class="camera-section">
-                <div class="camera-controls">
-                    <button class="btn" onclick="toggleCamera()">📹 Activer Caméra</button>
-                    <button class="btn danger" onclick="stopCamera()">🛑 Arrêter Caméra</button>
+        <div class="game-layout">
+            <!-- Panneau de gauche - Gestes détectés -->
+            <div class="gestures-panel">
+                <div class="gestures-header">
+                    <h3>🤏 Gestes Détectés</h3>
                 </div>
                 
-                <div class="camera-container">
-                    <video id="video" width="640" height="480" autoplay></video>
-                    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
-                    <div class="camera-overlay" id="camera-status">Caméra inactive</div>
+                <div class="current-detection">
+                    <div class="detection-label">Main détectée:</div>
+                    <div class="detected-hand" id="detected-hand">
+                        <span class="hand-status" id="hand-status">❌ Aucune main</span>
+                    </div>
+                </div>
+                
+                <div class="gesture-detection">
+                    <div class="detection-label">Geste actuel:</div>
+                    <div class="current-gesture-display" id="current-gesture-display">
+                        <span class="gesture-emoji" id="gesture-emoji">🤷</span>
+                        <span class="gesture-name" id="gesture-name">En attente</span>
+                    </div>
+                </div>
+                
+                <div class="last-round-gestures" id="last-round-section" style="display: none;">
+                    <div class="detection-label">Dernier round:</div>
+                    <div class="round-comparison">
+                        <div class="player-gesture-choice">
+                            <div class="choice-label">Vous</div>
+                            <div class="choice-gesture" id="player-choice">
+                                <span class="choice-emoji" id="player-choice-emoji">❓</span>
+                                <span class="choice-name" id="player-choice-name">-</span>
+                            </div>
+                        </div>
+                        <div class="vs-indicator">VS</div>
+                        <div class="computer-gesture-choice">
+                            <div class="choice-label">IA</div>
+                            <div class="choice-gesture" id="computer-choice">
+                                <span class="choice-emoji" id="computer-choice-emoji">❓</span>
+                                <span class="choice-name" id="computer-choice-name">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="round-result" id="round-result-indicator">
+                        <span id="round-winner-text">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panneau central - Jeu principal -->
+            <div class="game-board">
+                <div class="scores">
+                    <div class="score-card player-score">
+                        <div class="score-label">👤 Vous</div>
+                        <div class="score-number" id="player-score">0</div>
+                    </div>
+                    <div class="score-card computer-score">
+                        <div class="score-label">🤖 IA</div>
+                        <div class="score-number" id="computer-score">0</div>
+                    </div>
+                </div>
+
+                <div id="game-status" class="game-status">Premier à 5 points gagne la partie !</div>
+                <div id="round-info" class="round-info">Cliquez sur "Lancer la partie" pour commencer</div>
+
+                <div class="camera-section">
+                    <div class="camera-controls">
+                        <button class="btn" onclick="toggleCamera()">📹 Activer Caméra</button>
+                        <button class="btn danger" onclick="stopCamera()">🛑 Arrêter Caméra</button>
+                    </div>
+                    
+                    <div class="camera-container">
+                        <video id="video" width="640" height="480" autoplay></video>
+                        <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+                        <div class="camera-overlay" id="camera-status">Caméra inactive</div>
+                    </div>
+                </div>
+
+                <div class="current-round-info">
+                    <div class="round-battle" id="round-battle">
+                        <div class="battle-gesture player-battle">
+                            <div class="battle-label">Votre geste</div>
+                            <div class="battle-display" id="player-battle-gesture">
+                                <span class="battle-emoji" id="player-battle-emoji">❓</span>
+                                <span class="battle-name" id="player-battle-name">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="battle-vs">
+                            <div class="vs-text">VS</div>
+                            <div class="battle-result" id="battle-result">
+                                <span id="battle-winner">En attente du round...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="battle-gesture computer-battle">
+                            <div class="battle-label">Geste IA</div>
+                            <div class="battle-display" id="computer-battle-gesture">
+                                <span class="battle-emoji" id="computer-battle-emoji">❓</span>
+                                <span class="battle-name" id="computer-battle-name">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button id="play-button" class="play-button" onclick="startGameRound()">🚀 Démarrer les rounds automatiques</button>
+                    <button id="stop-button" class="stop-button" onclick="stopAutoRounds()" style="display: none;">⏹️ Arrêter les rounds automatiques</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎯 Comment jouer</h3>
+                    <p>1. Activez votre caméra</p>
+                    <p>2. Cliquez sur "🚀 Démarrer les rounds automatiques"</p>
+                    <p>3. Les rounds s'enchaînent automatiquement !</p>
+                    <p>4. Faites votre geste quand demandé (pierre ✊, papier ✋, ciseaux ✌️)</p>
+                    <p>5. Premier à 5 points remporte la partie !</p>
+                    <p>6. Relancez une nouvelle partie quand vous voulez</p>
                 </div>
             </div>
 
-            <div class="gesture-info">
-                <div class="current-gesture" id="current-gesture">En attente...</div>
-                <div class="gesture-feedback" id="gesture-feedback">Aucun geste détecté</div>
-            </div>
-
-            <div class="controls">
-                <button id="play-button" class="play-button" onclick="startGameRound()">🎮 Lancer la partie</button>
-            </div>
-
-            <div class="control-group">
-                <h3>🎯 Comment jouer</h3>
-                <p>1. Activez votre caméra</p>
-                <p>2. Cliquez sur "Lancer la partie"</p>
-                <p>3. Faites votre geste devant la caméra (pierre ✊, papier ✋, ciseaux ✌️)</p>
-                <p>4. Premier à 5 points gagne !</p>
+            <div class="history-panel">
+                <h3>📋 Historique des Rounds</h3>
+                <div class="history-stats">
+                    <div class="stat">
+                        <span class="stat-label">Rounds joués:</span>
+                        <span class="stat-value" id="total-rounds">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Victoires:</span>
+                        <span class="stat-value" id="player-wins">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Défaites:</span>
+                        <span class="stat-value" id="computer-wins">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Égalités:</span>
+                        <span class="stat-value" id="draws">0</span>
+                    </div>
+                </div>
+                <div class="history-list" id="history-list">
+                    <div class="history-placeholder">Aucun round joué</div>
+                </div>
             </div>
         </div>
     </div>
@@ -80,6 +179,15 @@
             gameWinner: null
         };
 
+        // Historique des rounds
+        let roundHistory = [];
+        let gameStats = {
+            totalRounds: 0,
+            playerWins: 0,
+            computerWins: 0,
+            draws: 0
+        };
+
         // Correspondance gestes-emojis
         const gestureEmojis = {
             'pierre': '✊',
@@ -93,16 +201,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
             updateGameState();
-            
-            // Charger l'état du jeu au démarrage
-            fetch('/api/game/state')
-                .then(response => response.json())
-                .then(data => {
-                    gameState = data;
-                    updateScoreDisplay();
-                    checkGameOver();
-                })
-                .catch(error => console.error('Erreur lors du chargement de l\'état du jeu:', error));
+            updateHistoryDisplay(); // Initialiser l'affichage de l'historique
         });
 
         // Animation des particules
@@ -199,7 +298,11 @@
             fetch('/api/game/state')
                 .then(response => response.json())
                 .then(data => {
-                    gameState = data;
+                    // Convertir les noms de propriétés du serveur vers le frontend
+                    gameState.playerScore = data.player_score;
+                    gameState.computerScore = data.computer_score;
+                    gameState.gameWinner = data.game_over ? 
+                        (data.player_score >= 5 ? 'player' : 'computer') : null;
                     updateScoreDisplay();
                 })
                 .catch(error => console.error('Erreur:', error));
@@ -228,6 +331,15 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Résultat du round:', data);
+                
+                // Mettre à jour l'état du jeu avec les données du serveur
+                if (data.game_state) {
+                    gameState.playerScore = data.game_state.player_score;
+                    gameState.computerScore = data.game_state.computer_score;
+                    gameState.gameWinner = data.game_state.game_over ? 
+                        (data.game_state.player_score >= 5 ? 'player' : 'computer') : null;
+                }
+                
                 updateScoreDisplay();
                 showRoundResult(data);
                 checkGameOver();
@@ -235,36 +347,251 @@
             .catch(error => console.error('Erreur:', error));
         }
 
+        // Fonctions de gestion de l'historique
+        function addRoundToHistory(playerGesture, computerGesture, roundWinner, playerScore, computerScore) {
+            const round = {
+                roundNumber: roundHistory.length + 1,
+                playerGesture,
+                computerGesture,
+                roundWinner,
+                playerScore,
+                computerScore,
+                timestamp: new Date()
+            };
+            
+            roundHistory.push(round);
+            
+            // Mettre à jour les statistiques
+            gameStats.totalRounds++;
+            if (roundWinner === 'Joueur') {
+                gameStats.playerWins++;
+            } else if (roundWinner === 'Ordinateur') {
+                gameStats.computerWins++;
+            } else {
+                gameStats.draws++;
+            }
+            
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            // Mettre à jour les statistiques
+            document.getElementById('total-rounds').textContent = gameStats.totalRounds;
+            document.getElementById('player-wins').textContent = gameStats.playerWins;
+            document.getElementById('computer-wins').textContent = gameStats.computerWins;
+            document.getElementById('draws').textContent = gameStats.draws;
+            
+            // Mettre à jour la liste des rounds
+            const roundsList = document.getElementById('history-list');
+            
+            if (roundHistory.length === 0) {
+                roundsList.innerHTML = '<div class="history-placeholder">Aucun round joué</div>';
+                return;
+            }
+            
+            roundsList.innerHTML = '';
+            
+            roundHistory.forEach(round => {
+                const roundDiv = document.createElement('div');
+                roundDiv.className = `round-item ${round.roundWinner === 'Joueur' ? 'player-win' : 
+                                                   round.roundWinner === 'Ordinateur' ? 'computer-win' : 'draw'}`;
+                
+                roundDiv.innerHTML = `
+                    <div class="round-number">Round ${round.roundNumber}</div>
+                    <div class="round-gestures">
+                        <span class="player-gesture">${getGestureEmoji(round.playerGesture)}</span>
+                        <span class="vs">vs</span>
+                        <span class="computer-gesture">${getGestureEmoji(round.computerGesture)}</span>
+                    </div>
+                    <div class="round-winner">${round.roundWinner === 'Égalité' ? '🤝 Égalité' : round.roundWinner}</div>
+                    <div class="round-score">${round.playerScore} - ${round.computerScore}</div>
+                `;
+                
+                roundsList.appendChild(roundDiv);
+            });
+            
+            // Faire défiler vers le bas pour voir le dernier round
+            roundsList.scrollTop = roundsList.scrollHeight;
+        }
+
+        function clearHistory() {
+            roundHistory = [];
+            gameStats = {
+                totalRounds: 0,
+                playerWins: 0,
+                computerWins: 0,
+                draws: 0
+            };
+            updateHistoryDisplay();
+        }
+
+        function getGestureEmoji(gesture) {
+            const emojis = {
+                'pierre': '🪨',
+                'papier': '📄',
+                'ciseaux': '✂️'
+            };
+            return emojis[gesture] || gesture;
+        }
+
+        function updateLastRoundDisplay(playerGesture, computerGesture, roundWinner) {
+            // Afficher la section du dernier round
+            const lastRoundSection = document.getElementById('last-round-section');
+            lastRoundSection.style.display = 'block';
+            
+            // Mettre à jour les gestes choisis
+            document.getElementById('player-choice-emoji').textContent = gestureEmojis[playerGesture] || '❓';
+            document.getElementById('player-choice-name').textContent = playerGesture.charAt(0).toUpperCase() + playerGesture.slice(1);
+            
+            document.getElementById('computer-choice-emoji').textContent = gestureEmojis[computerGesture] || '❓';
+            document.getElementById('computer-choice-name').textContent = computerGesture.charAt(0).toUpperCase() + computerGesture.slice(1);
+            
+            // Mettre à jour le résultat du round
+            const roundResultElement = document.getElementById('round-result-indicator');
+            const roundWinnerText = document.getElementById('round-winner-text');
+            
+            roundWinnerText.textContent = `🏆 ${roundWinner} gagne !`;
+            
+            // Appliquer le style selon le gagnant
+            roundResultElement.className = 'round-result';
+            if (roundWinner === 'Joueur') {
+                roundResultElement.classList.add('player-win');
+            } else if (roundWinner === 'Ordinateur') {
+                roundResultElement.classList.add('computer-win');
+            } else {
+                roundResultElement.classList.add('draw');
+                roundWinnerText.textContent = '🤝 Égalité - Aucun point !';
+            }
+        }
+
+        function updateBattleDisplay(playerGesture, computerGesture, roundWinner) {
+            // Mettre à jour le geste du joueur
+            document.getElementById('player-battle-emoji').textContent = gestureEmojis[playerGesture] || '❓';
+            document.getElementById('player-battle-name').textContent = playerGesture.charAt(0).toUpperCase() + playerGesture.slice(1);
+            
+            // Mettre à jour le geste de l'IA
+            document.getElementById('computer-battle-emoji').textContent = gestureEmojis[computerGesture] || '❓';
+            document.getElementById('computer-battle-name').textContent = computerGesture.charAt(0).toUpperCase() + computerGesture.slice(1);
+            
+            // Mettre à jour le résultat de la bataille
+            const battleResultElement = document.getElementById('battle-result');
+            const battleWinnerElement = document.getElementById('battle-winner');
+            
+            // Réinitialiser les classes
+            battleResultElement.className = 'battle-result';
+            
+            if (roundWinner === 'Joueur') {
+                battleWinnerElement.textContent = '🏆 Vous gagnez !';
+                battleResultElement.classList.add('player-win');
+            } else if (roundWinner === 'Ordinateur') {
+                battleWinnerElement.textContent = '🤖 IA gagne !';
+                battleResultElement.classList.add('computer-win');
+            } else {
+                battleWinnerElement.textContent = '🤝 Égalité - Aucun point';
+                battleResultElement.classList.add('draw');
+            }
+        }
+
+        function resetBattleDisplay() {
+            // Réinitialiser les gestes
+            document.getElementById('player-battle-emoji').textContent = '❓';
+            document.getElementById('player-battle-name').textContent = '-';
+            
+            document.getElementById('computer-battle-emoji').textContent = '❓';
+            document.getElementById('computer-battle-name').textContent = '-';
+            
+            // Réinitialiser le résultat
+            const battleResultElement = document.getElementById('battle-result');
+            const battleWinnerElement = document.getElementById('battle-winner');
+            
+            battleResultElement.className = 'battle-result';
+            battleWinnerElement.textContent = 'En attente du round...';
+        }
+
         function showRoundResult(data) {
-            const resultText = data.result === 'draw' ? 'Égalité' : 
-                              data.result === 'player' ? 'Vous gagnez' : 'IA gagne';
+            const resultText = data.result === 'draw' ? '🤝 Égalité - Aucun point marqué' : 
+                              data.result === 'player' ? '🏆 Vous gagnez ce round !' : '🤖 L\'IA gagne ce round !';
             
-            const message = `${resultText} ! ${gestureEmojis[data.player_gesture]} vs ${gestureEmojis[data.computer_gesture]}`;
+            const message = `${resultText} ${gestureEmojis[data.player_gesture]} vs ${gestureEmojis[data.computer_gesture]}`;
             
-            // Afficher temporairement le résultat
+            // Ajouter le round à l'historique
+            const roundWinner = data.result === 'draw' ? 'Égalité' : 
+                               data.result === 'player' ? 'Joueur' : 'Ordinateur';
+            
+            addRoundToHistory(
+                data.player_gesture,
+                data.computer_gesture,
+                roundWinner,
+                gameState.playerScore,
+                gameState.computerScore
+            );
+            
+            // Mettre à jour le panneau des gestes avec le dernier round
+            updateLastRoundDisplay(data.player_gesture, data.computer_gesture, roundWinner);
+            
+            // Mettre à jour la bataille au centre
+            updateBattleDisplay(data.player_gesture, data.computer_gesture, roundWinner);
+            
+            // Afficher le résultat
             const statusElement = document.getElementById('game-status');
-            const originalText = statusElement.textContent;
+            const playButton = document.getElementById('play-button');
+            const roundInfo = document.getElementById('round-info');
+            
             statusElement.textContent = message;
             statusElement.style.color = data.result === 'player' ? '#00b894' : 
                                        data.result === 'computer' ? '#e17055' : '#ffeaa7';
             
+            playButton.textContent = '✅ Round terminé';
+            roundInfo.textContent = `Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
+            
+            // Vérifier si la partie est terminée
             setTimeout(() => {
-                statusElement.textContent = originalText;
-                statusElement.style.color = '#74b9ff';
+                updateGameState(); // Recharger l'état du jeu
+                
+                setTimeout(() => {
+                    if (isGameOver()) {
+                        checkGameOver();
+                    } else {
+                        // Préparer et lancer automatiquement le prochain round si activé
+                        if (autoRoundsEnabled) {
+                            statusElement.textContent = `Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
+                            statusElement.style.color = '#74b9ff';
+                            roundInfo.style.display = 'none';
+                            
+                            // Compte à rebours visuel avant le prochain round
+                            let countdown = 3;
+                            nextRoundCountdown = setInterval(() => {
+                                statusElement.textContent = `Prochain round dans ${countdown} seconde${countdown > 1 ? 's' : ''} !`;
+                                countdown--;
+                                
+                                if (countdown < 0) {
+                                    clearInterval(nextRoundCountdown);
+                                    if (!isGameOver() && autoRoundsEnabled) {
+                                        startGameRound();
+                                    }
+                                }
+                            }, 1000);
+                        } else {
+                            // Mode manuel - réafficher le bouton play
+                            playButton.style.display = 'inline-block';
+                            playButton.disabled = false;
+                            playButton.classList.remove('disabled');
+                            playButton.textContent = '🚀 Démarrer les rounds automatiques';
+                            statusElement.textContent = `Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
+                            statusElement.style.color = '#74b9ff';
+                            roundInfo.style.display = 'none';
+                        }
+                    }
+                }, 1000);
             }, 2000);
-
-            // Réactiver le bouton après le round
-            setTimeout(() => {
-                const playButton = document.getElementById('play-button');
-                playButton.disabled = false;
-                playButton.classList.remove('disabled');
-                playButton.textContent = '🎮 Lancer la partie';
-                document.getElementById('round-info').style.display = 'none';
-            }, 3000);
         }
 
         let roundInProgress = false;
         let gestureDetectionTimeout = null;
+        let countdownInterval = null;
+        let detectedGestureForRound = null;
+        let autoRoundsEnabled = false;
+        let nextRoundCountdown = null;
 
         function startGameRound() {
             if (isGameOver() || roundInProgress) {
@@ -272,42 +599,145 @@
             }
 
             const playButton = document.getElementById('play-button');
+            const stopButton = document.getElementById('stop-button');
             const roundInfo = document.getElementById('round-info');
+
+            // Activer le mode automatique si c'est le premier round
+            if (!autoRoundsEnabled) {
+                autoRoundsEnabled = true;
+            }
             
-            // Désactiver le bouton et changer le texte
-            playButton.disabled = true;
-            playButton.classList.add('disabled');
-            playButton.textContent = '⏳ En attente de votre geste...';
+            // Masquer le bouton play et afficher le bouton stop
+            playButton.style.display = 'none';
+            stopButton.style.display = 'block';
+            
             roundInfo.style.display = 'block';
             roundInProgress = true;
+            detectedGestureForRound = null;
+            
+            console.log('🎮 Début du round - roundInProgress:', roundInProgress);
 
             // Activer la caméra automatiquement si pas déjà active
             if (!cameraActive) {
                 toggleCamera();
+                // Attendre un peu que la caméra se lance
+                setTimeout(() => startCountdown(), 500);
+            } else {
+                startCountdown();
             }
-
-            // Attendre un geste pendant 10 secondes
-            gestureDetectionTimeout = setTimeout(() => {
-                if (roundInProgress) {
-                    // Timeout - jouer aléatoirement
-                    const randomGestures = ['pierre', 'papier', 'ciseaux'];
-                    const randomGesture = randomGestures[Math.floor(Math.random() * randomGestures.length)];
-                    
-                    console.log('Timeout - geste aléatoire:', randomGesture);
-                    playRound(randomGesture);
-                    roundInProgress = false;
-                }
-            }, 10000);
         }
 
-        // Modifier la fonction de détection pour auto-jouer
+        function startCountdown() {
+            let countdown = 3;
+            const roundInfo = document.getElementById('round-info');
+            
+            // Réinitialiser le geste détecté pour ce round
+            detectedGestureForRound = null;
+            console.log('Nouveau round - Geste réinitialisé');
+            
+            roundInfo.textContent = `Préparez-vous ! ${countdown} secondes...`;
+            
+            countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    roundInfo.textContent = `Préparez-vous ! ${countdown} secondes...`;
+                } else {
+                    clearInterval(countdownInterval);
+                    roundInfo.textContent = 'MAINTENANT ! Faites votre geste !';
+                    
+                    // Capturer le geste pendant 2 secondes (plus de temps)
+                    gestureDetectionTimeout = setTimeout(() => {
+                        finishRound();
+                    }, 2000);
+                }
+            }, 1000);
+        }
+
+        function finishRound() {
+            // Nettoyer le timeout s'il existe
+            if (gestureDetectionTimeout) {
+                clearTimeout(gestureDetectionTimeout);
+                gestureDetectionTimeout = null;
+            }
+            
+            // Utiliser le dernier geste détecté ou un geste aléatoire si aucun
+            let playerGesture = detectedGestureForRound;
+            
+            console.log('Fin de round - Geste détecté:', detectedGestureForRound);
+            
+            if (!playerGesture || playerGesture === 'aucun' || playerGesture === 'erreur') {
+                // Geste aléatoire si aucun geste détecté
+                const randomGestures = ['pierre', 'papier', 'ciseaux'];
+                playerGesture = randomGestures[Math.floor(Math.random() * randomGestures.length)];
+                console.log('⚠️ Aucun geste détecté, geste aléatoire:', playerGesture);
+                
+                // Informer l'utilisateur
+                const roundInfo = document.getElementById('round-info');
+                roundInfo.textContent = `⚠️ Geste aléatoire: ${playerGesture.toUpperCase()}`;
+                roundInfo.style.color = '#e17055';
+            } else {
+                console.log('✅ Geste utilisé pour le round:', playerGesture);
+            }
+            
+            // Jouer le round
+            playRound(playerGesture);
+            roundInProgress = false;
+        }
+
+        // Modifier la fonction de détection pour capturer le geste pendant le round
         function handleGestureDetected(gesture) {
             if (roundInProgress && gesture !== 'aucun' && gesture !== 'erreur') {
-                clearTimeout(gestureDetectionTimeout);
-                console.log('Geste détecté pendant le round:', gesture);
-                playRound(gesture);
-                roundInProgress = false;
+                // Toujours mettre à jour avec le dernier geste détecté
+                detectedGestureForRound = gesture;
+                console.log('Geste capturé pour le round:', gesture);
+                
+                // Mettre à jour l'interface pour confirmer la capture
+                const roundInfo = document.getElementById('round-info');
+                roundInfo.textContent = `✅ Geste capturé: ${gesture.toUpperCase()} ${gestureEmojis[gesture]}`;
+                roundInfo.style.color = '#00b894';
             }
+        }
+
+        function resetGesturesPanel() {
+            // Réinitialiser la détection de main
+            const handStatusElement = document.getElementById('hand-status');
+            handStatusElement.textContent = '❌ Aucune main';
+            handStatusElement.parentElement.style.background = 'linear-gradient(135deg, #fd79a8, #e84393)';
+            
+            // Réinitialiser le geste actuel
+            const gestureEmojiElement = document.getElementById('gesture-emoji');
+            const gestureNameElement = document.getElementById('gesture-name');
+            gestureEmojiElement.textContent = '🤷';
+            gestureNameElement.textContent = 'En attente';
+            gestureEmojiElement.parentElement.style.background = 'linear-gradient(135deg, #636e72, #2d3436)';
+            
+            // Cacher la section du dernier round
+            const lastRoundSection = document.getElementById('last-round-section');
+            lastRoundSection.style.display = 'none';
+        }
+
+        function stopAutoRounds() {
+            autoRoundsEnabled = false;
+            
+            // Nettoyer les timers en cours
+            if (nextRoundCountdown) {
+                clearInterval(nextRoundCountdown);
+                nextRoundCountdown = null;
+            }
+            
+            // Switcher les boutons
+            document.getElementById('play-button').style.display = 'block';
+            document.getElementById('stop-button').style.display = 'none';
+            
+            // Mettre à jour l'affichage
+            const statusElement = document.getElementById('game-status');
+            const playButton = document.getElementById('play-button');
+            
+            playButton.disabled = false;
+            playButton.classList.remove('disabled');
+            playButton.textContent = '🚀 Démarrer les rounds automatiques';
+            statusElement.textContent = `Rounds automatiques arrêtés - Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
+            statusElement.style.color = '#e17055';
         }
 
         function isGameOver() {
@@ -317,13 +747,16 @@
         function checkGameOver() {
             if (gameState.gameWinner) {
                 const winnerText = gameState.gameWinner === 'player' ? 
-                    '🎉 Félicitations ! Vous avez gagné !' : 
-                    '😔 L\'IA a gagné ! Réessayez !';
+                    '� FÉLICITATIONS ! VOUS AVEZ GAGNÉ LA PARTIE !' : 
+                    '😔 DOMMAGE ! L\'IA A GAGNÉ LA PARTIE !';
+                
+                const finalScore = `Score final: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
                 
                 document.getElementById('game-status').innerHTML = `
-                    <div style="font-size: 1.5em; margin-bottom: 15px;">${winnerText}</div>
-                    <button onclick="resetGame()" class="btn" style="font-size: 1.2em; padding: 12px 25px;">
-                        🔄 Nouvelle partie
+                    <div style="font-size: 1.4em; margin-bottom: 10px; font-weight: bold;">${winnerText}</div>
+                    <div style="font-size: 1.1em; margin-bottom: 20px; color: #636e72;">${finalScore}</div>
+                    <button onclick="resetGame()" class="btn" style="font-size: 1.2em; padding: 15px 30px; background: linear-gradient(135deg, #00b894, #55a3ff);">
+                        🔄 Nouvelle partie (5 points)
                     </button>
                 `;
                 
@@ -331,7 +764,10 @@
                 const playButton = document.getElementById('play-button');
                 playButton.disabled = true;
                 playButton.classList.add('disabled');
-                playButton.textContent = 'Jeu terminé';
+                playButton.textContent = '🏁 Partie terminée';
+                
+                // Cacher les infos de round
+                document.getElementById('round-info').style.display = 'none';
             }
         }
 
@@ -339,19 +775,58 @@
             fetch('/reset', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
-                    gameState = data;
+                    // Convertir les noms de propriétés du serveur vers le frontend
+                    gameState.playerScore = data.player_score;
+                    gameState.computerScore = data.computer_score;
+                    gameState.gameWinner = null;
+                    
+                    // Vider l'historique
+                    clearHistory();
+                    
+                    // Réinitialiser le panneau des gestes
+                    resetGesturesPanel();
+                    
+                    // Réinitialiser l'affichage de bataille au centre
+                    resetBattleDisplay();
+                    
+                    // Réinitialiser le mode automatique
+                    autoRoundsEnabled = false;
+                    if (nextRoundCountdown) {
+                        clearInterval(nextRoundCountdown);
+                        nextRoundCountdown = null;
+                    }
+                    
                     updateScoreDisplay();
-                    document.getElementById('game-status').textContent = 'Premier à 5 points gagne !';
+                    document.getElementById('game-status').textContent = 'Nouvelle partie ! Premier à 5 points gagne ! (Rounds automatiques)';
                     document.getElementById('game-status').style.color = '#74b9ff';
                     
                     // Réactiver le bouton de jeu
                     const playButton = document.getElementById('play-button');
+                    const stopButton = document.getElementById('stop-button');
                     playButton.disabled = false;
                     playButton.classList.remove('disabled');
-                    playButton.textContent = '🎮 Lancer la partie';
+                    playButton.textContent = '🚀 Démarrer les rounds automatiques';
+                    playButton.style.display = 'block';
+                    stopButton.style.display = 'none';
                     
+                    // Cacher les infos de round
                     document.getElementById('round-info').style.display = 'none';
-                    console.log('Jeu réinitialisé');
+                    
+                    // Réinitialiser les variables de round
+                    roundInProgress = false;
+                    detectedGestureForRound = null;
+                    
+                    // Nettoyer les timers
+                    if (gestureDetectionTimeout) {
+                        clearTimeout(gestureDetectionTimeout);
+                        gestureDetectionTimeout = null;
+                    }
+                    if (countdownInterval) {
+                        clearInterval(countdownInterval);
+                        countdownInterval = null;
+                    }
+                    
+                    console.log('Nouvelle partie démarrée !');
                 })
                 .catch(error => console.error('Erreur lors de la réinitialisation:', error));
         }
@@ -367,28 +842,61 @@
 
         // Écouter la détection de gestes
         socket.on('gesture_detected', function(data) {
-            console.log('Geste détecté via socket:', data);
+            console.log('📡 Geste détecté via socket:', data, 'roundInProgress:', roundInProgress);
             updateDetectedHand(data.gesture, data.hand_detected);
             
             // Si un geste valide est détecté et que le jeu n'est pas terminé
             if (data.gesture !== 'aucun' && data.gesture !== 'erreur' && !isGameOver()) {
-                document.getElementById('gesture-feedback').textContent = 
-                    `Geste détecté: ${data.gesture.toUpperCase()} ${gestureEmojis[data.gesture]}`;
+                const gestureElement = document.getElementById('gesture-feedback');
+                if (gestureElement) {
+                    gestureElement.textContent = 
+                        `Geste détecté: ${data.gesture.toUpperCase()} ${gestureEmojis[data.gesture]}`;
+                }
                 
-                // Auto-jouer si un round est en cours
+                // Capturer le geste si un round est en cours
                 handleGestureDetected(data.gesture);
             }
         });
 
         function updateDetectedHand(gesture, handDetected) {
+            // Mettre à jour l'ancien élément (pour compatibilité)
             const currentGestureElement = document.getElementById('current-gesture');
             
+            if (currentGestureElement) {
+                if (handDetected) {
+                    currentGestureElement.textContent = `Main détectée: ${gesture.toUpperCase()} ${gestureEmojis[gesture]}`;
+                    currentGestureElement.style.background = 'linear-gradient(135deg, #00b894, #55a3ff)';
+                } else {
+                    currentGestureElement.textContent = 'Aucune main détectée';
+                    currentGestureElement.style.background = 'linear-gradient(135deg, #636e72, #2d3436)';
+                }
+            }
+            
+            // Mettre à jour le nouveau panneau des gestes
+            const handStatusElement = document.getElementById('hand-status');
+            const gestureEmojiElement = document.getElementById('gesture-emoji');
+            const gestureNameElement = document.getElementById('gesture-name');
+            
             if (handDetected) {
-                currentGestureElement.textContent = `Main détectée: ${gesture.toUpperCase()} ${gestureEmojis[gesture]}`;
-                currentGestureElement.style.background = 'linear-gradient(135deg, #00b894, #55a3ff)';
+                handStatusElement.textContent = '✅ Main détectée';
+                handStatusElement.parentElement.style.background = 'linear-gradient(135deg, #00b894, #00a085)';
+                
+                if (gesture && gesture !== 'aucun' && gesture !== 'erreur') {
+                    gestureEmojiElement.textContent = gestureEmojis[gesture] || '🤷';
+                    gestureNameElement.textContent = gesture.charAt(0).toUpperCase() + gesture.slice(1);
+                    gestureEmojiElement.parentElement.style.background = 'linear-gradient(135deg, #74b9ff, #0984e3)';
+                } else {
+                    gestureEmojiElement.textContent = '🤷';
+                    gestureNameElement.textContent = 'Geste non reconnu';
+                    gestureEmojiElement.parentElement.style.background = 'linear-gradient(135deg, #fdcb6e, #e17055)';
+                }
             } else {
-                currentGestureElement.textContent = 'Aucune main détectée';
-                currentGestureElement.style.background = 'linear-gradient(135deg, #636e72, #2d3436)';
+                handStatusElement.textContent = '❌ Aucune main';
+                handStatusElement.parentElement.style.background = 'linear-gradient(135deg, #fd79a8, #e84393)';
+                
+                gestureEmojiElement.textContent = '🤷';
+                gestureNameElement.textContent = 'En attente';
+                gestureEmojiElement.parentElement.style.background = 'linear-gradient(135deg, #636e72, #2d3436)';
             }
         }
 

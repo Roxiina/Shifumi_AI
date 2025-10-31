@@ -1,0 +1,288 @@
+[
+  {
+    "date": "2025-10-31T13:45:14.778478",
+    "winner": "IA",
+    "player_score": 2,
+    "computer_score": 5,
+    "game_details": [
+      {
+        "round": 1,
+        "player_gesture": "papier",
+        "computer_gesture": "ciseaux",
+        "result": "computer",
+        "timestamp": "2025-10-31T13:43:28.052932"
+      },
+      {
+        "round": 2,
+        "player_gesture": "pierre",
+        "computer_gesture": "pierre",
+        "result": "draw",
+        "timestamp": "2025-10-31T13:43:42.617208"
+      },
+      {
+        "round": 3,
+        "player_gesture": "pierre",
+        "computer_gesture": "papier",
+        "result": "computer",
+        "timestamp": "2025-10-31T13:44:01.491124"
+      },
+      {
+        "round": 4,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T13:44:09.349451"
+      },
+      {
+        "round": 5,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T13:44:17.840124"
+      },
+      {
+        "round": 6,
+        "player_gesture": "pierre",
+        "computer_gesture": "papier",
+        "result": "computer",
+        "timestamp": "2025-10-31T13:44:27.367240"
+      },
+      {
+        "round": 7,
+        "player_gesture": "papier",
+        "computer_gesture": "pierre",
+        "result": "player",
+        "timestamp": "2025-10-31T13:44:35.403595"
+      },
+      {
+        "round": 8,
+        "player_gesture": "pierre",
+        "computer_gesture": "papier",
+        "result": "computer",
+        "timestamp": "2025-10-31T13:44:43.080500"
+      },
+      {
+        "round": 9,
+        "player_gesture": "pierre",
+        "computer_gesture": "pierre",
+        "result": "draw",
+        "timestamp": "2025-10-31T13:44:51.613102"
+      },
+      {
+        "round": 10,
+        "player_gesture": "pierre",
+        "computer_gesture": "ciseaux",
+        "result": "player",
+        "timestamp": "2025-10-31T13:44:59.317094"
+      },
+      {
+        "round": 11,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T13:45:07.049443"
+      },
+      {
+        "round": 12,
+        "player_gesture": "papier",
+        "computer_gesture": "ciseaux",
+        "result": "computer",
+        "timestamp": "2025-10-31T13:45:14.778478"
+      }
+    ],
+    "total_rounds": 12
+  },
+  {
+    "date": "2025-10-31T14:06:33.169699",
+    "winner": "Joueur",
+    "player_score": 5,
+    "computer_score": 2,
+    "game_details": [
+      {
+        "round": 1,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T13:50:25.813610"
+      },
+      {
+        "round": 2,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T13:51:00.427635"
+      },
+      {
+        "round": 3,
+        "player_gesture": "papier",
+        "computer_gesture": "ciseaux",
+        "result": "computer",
+        "timestamp": "2025-10-31T13:56:02.762990"
+      },
+      {
+        "round": 4,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:00:01.829703"
+      },
+      {
+        "round": 5,
+        "player_gesture": "ciseaux",
+        "computer_gesture": "pierre",
+        "result": "computer",
+        "timestamp": "2025-10-31T14:01:12.774178"
+      },
+      {
+        "round": 6,
+        "player_gesture": "papier",
+        "computer_gesture": "pierre",
+        "result": "player",
+        "timestamp": "2025-10-31T14:01:58.712109"
+      },
+      {
+        "round": 7,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:05:00.456155"
+      },
+      {
+        "round": 8,
+        "player_gesture": "ciseaux",
+        "computer_gesture": "ciseaux",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:05:11.492695"
+      },
+      {
+        "round": 9,
+        "player_gesture": "pierre",
+        "computer_gesture": "ciseaux",
+        "result": "player",
+        "timestamp": "2025-10-31T14:05:22.535417"
+      },
+      {
+        "round": 10,
+        "player_gesture": "papier",
+        "computer_gesture": "pierre",
+        "result": "player",
+        "timestamp": "2025-10-31T14:05:33.599400"
+      },
+      {
+        "round": 11,
+        "player_gesture": "pierre",
+        "computer_gesture": "ciseaux",
+        "result": "player",
+        "timestamp": "2025-10-31T14:05:44.636237"
+      },
+      {
+        "round": 12,
+        "player_gesture": "pierre",
+        "computer_gesture": "pierre",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:05:55.669815"
+      },
+      {
+        "round": 13,
+        "player_gesture": "ciseaux",
+        "computer_gesture": "ciseaux",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:06:07.803163"
+      },
+      {
+        "round": 14,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:06:22.536019"
+      },
+      {
+        "round": 15,
+        "player_gesture": "papier",
+        "computer_gesture": "pierre",
+        "result": "player",
+        "timestamp": "2025-10-31T14:06:33.168939"
+      }
+    ],
+    "total_rounds": 15
+  },
+  {
+    "date": "2025-10-31T14:10:51.032491",
+    "winner": "Joueur",
+    "player_score": 5,
+    "computer_score": 1,
+    "game_details": [
+      {
+        "round": 1,
+        "player_gesture": "pierre",
+        "computer_gesture": "ciseaux",
+        "result": "player",
+        "timestamp": "2025-10-31T14:07:07.167939"
+      },
+      {
+        "round": 2,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:07:18.202832"
+      },
+      {
+        "round": 3,
+        "player_gesture": "ciseaux",
+        "computer_gesture": "ciseaux",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:07:29.230780"
+      },
+      {
+        "round": 4,
+        "player_gesture": "papier",
+        "computer_gesture": "pierre",
+        "result": "player",
+        "timestamp": "2025-10-31T14:07:40.257035"
+      },
+      {
+        "round": 5,
+        "player_gesture": "ciseaux",
+        "computer_gesture": "papier",
+        "result": "player",
+        "timestamp": "2025-10-31T14:07:51.277647"
+      },
+      {
+        "round": 6,
+        "player_gesture": "papier",
+        "computer_gesture": "papier",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:10:02.924879"
+      },
+      {
+        "round": 7,
+        "player_gesture": "ciseaux",
+        "computer_gesture": "ciseaux",
+        "result": "draw",
+        "timestamp": "2025-10-31T14:10:14.961812"
+      },
+      {
+        "round": 8,
+        "player_gesture": "pierre",
+        "computer_gesture": "papier",
+        "result": "computer",
+        "timestamp": "2025-10-31T14:10:26.982055"
+      },
+      {
+        "round": 9,
+        "player_gesture": "ciseaux",
+        "computer_gesture": "papier",
+        "result": "player",
+        "timestamp": "2025-10-31T14:10:39.005413"
+      },
+      {
+        "round": 10,
+        "player_gesture": "pierre",
+        "computer_gesture": "ciseaux",
+        "result": "player",
+        "timestamp": "2025-10-31T14:10:51.031744"
+      }
+    ],
+    "total_rounds": 10
+  }
+]
