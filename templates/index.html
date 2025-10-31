@@ -94,7 +94,17 @@
 
                 <div class="controls">
                     <button id="play-button" class="play-button" onclick="startGameRound()">🚀 Démarrer les rounds automatiques</button>
-                    <button id="stop-button" class="stop-button" onclick="stopAutoRounds()" style="display: none;">⏹️ Arrêter les rounds automatiques</button>
+                    <button id="stop-button" class="stop-button" onclick="stopAutoRounds()" style="display: none;">⏹️ Arrêter</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎯 Comment jouer</h3>
+                    <p>1. Activez votre caméra</p>
+                    <p>2. Cliquez sur "🚀 Démarrer les rounds automatiques"</p>
+                    <p>3. Les rounds s'enchaînent automatiquement !</p>
+                    <p>4. Faites votre geste quand demandé (pierre ✊, papier ✋, ciseaux ✌️)</p>
+                    <p>5. Premier à 5 points remporte la partie !</p>
+                    <p>6. Relancez une nouvelle partie quand vous voulez</p>
                 </div>
             </div>
 
@@ -428,47 +438,13 @@
         }
 
         function updateBattleDisplay(playerGesture, computerGesture, roundWinner) {
-            // Mettre à jour le geste du joueur
-            document.getElementById('player-battle-emoji').textContent = gestureEmojis[playerGesture] || '❓';
-            document.getElementById('player-battle-name').textContent = playerGesture.charAt(0).toUpperCase() + playerGesture.slice(1);
-            
-            // Mettre à jour le geste de l'IA
-            document.getElementById('computer-battle-emoji').textContent = gestureEmojis[computerGesture] || '❓';
-            document.getElementById('computer-battle-name').textContent = computerGesture.charAt(0).toUpperCase() + computerGesture.slice(1);
-            
-            // Mettre à jour le résultat de la bataille
-            const battleResultElement = document.getElementById('battle-result');
-            const battleWinnerElement = document.getElementById('battle-winner');
-            
-            // Réinitialiser les classes
-            battleResultElement.className = 'battle-result';
-            
-            if (roundWinner === 'Joueur') {
-                battleWinnerElement.textContent = '🏆 Vous gagnez !';
-                battleResultElement.classList.add('player-win');
-            } else if (roundWinner === 'Ordinateur') {
-                battleWinnerElement.textContent = '🤖 IA gagne !';
-                battleResultElement.classList.add('computer-win');
-            } else {
-                battleWinnerElement.textContent = '🤝 Égalité - Aucun point';
-                battleResultElement.classList.add('draw');
-            }
+            // Section bataille supprimée - fonction désactivée pour éviter les erreurs
+            console.log('Bataille:', playerGesture, 'vs', computerGesture, '→', roundWinner);
         }
 
         function resetBattleDisplay() {
-            // Réinitialiser les gestes
-            document.getElementById('player-battle-emoji').textContent = '❓';
-            document.getElementById('player-battle-name').textContent = '-';
-            
-            document.getElementById('computer-battle-emoji').textContent = '❓';
-            document.getElementById('computer-battle-name').textContent = '-';
-            
-            // Réinitialiser le résultat
-            const battleResultElement = document.getElementById('battle-result');
-            const battleWinnerElement = document.getElementById('battle-winner');
-            
-            battleResultElement.className = 'battle-result';
-            battleWinnerElement.textContent = 'En attente du round...';
+            // Section bataille supprimée - fonction désactivée pour éviter les erreurs
+            console.log('Réinitialisation de la bataille');
         }
 
         function showRoundResult(data) {
