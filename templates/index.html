@@ -94,17 +94,7 @@
 
                 <div class="controls">
                     <button id="play-button" class="play-button" onclick="startGameRound()">🚀 Démarrer les rounds automatiques</button>
-                    <button id="stop-button" class="stop-button" onclick="stopAutoRounds()" style="display: none;">⏹️ Arrêter</button>
-                </div>
-
-                <div class="control-group">
-                    <h3>🎯 Comment jouer</h3>
-                    <p>1. Activez votre caméra</p>
-                    <p>2. Cliquez sur "🚀 Démarrer les rounds automatiques"</p>
-                    <p>3. Les rounds s'enchaînent automatiquement !</p>
-                    <p>4. Faites votre geste quand demandé (pierre ✊, papier ✋, ciseaux ✌️)</p>
-                    <p>5. Premier à 5 points remporte la partie !</p>
-                    <p>6. Relancez une nouvelle partie quand vous voulez</p>
+                    <button id="stop-button" class="stop-button" onclick="stopAutoRounds()" style="display: none;">⏹️ Arrêter les rounds automatiques</button>
                 </div>
             </div>
 
@@ -438,13 +428,47 @@
         }
 
         function updateBattleDisplay(playerGesture, computerGesture, roundWinner) {
-            // Section bataille supprimée - fonction désactivée pour éviter les erreurs
-            console.log('Bataille:', playerGesture, 'vs', computerGesture, '→', roundWinner);
+            // Mettre à jour le geste du joueur
+            document.getElementById('player-battle-emoji').textContent = gestureEmojis[playerGesture] || '❓';
+            document.getElementById('player-battle-name').textContent = playerGesture.charAt(0).toUpperCase() + playerGesture.slice(1);
+            
+            // Mettre à jour le geste de l'IA
+            document.getElementById('computer-battle-emoji').textContent = gestureEmojis[computerGesture] || '❓';
+            document.getElementById('computer-battle-name').textContent = computerGesture.charAt(0).toUpperCase() + computerGesture.slice(1);
+            
+            // Mettre à jour le résultat de la bataille
+            const battleResultElement = document.getElementById('battle-result');
+            const battleWinnerElement = document.getElementById('battle-winner');
+            
+            // Réinitialiser les classes
+            battleResultElement.className = 'battle-result';
+            
+            if (roundWinner === 'Joueur') {
+                battleWinnerElement.textContent = '🏆 Vous gagnez !';
+                battleResultElement.classList.add('player-win');
+            } else if (roundWinner === 'Ordinateur') {
+                battleWinnerElement.textContent = '🤖 IA gagne !';
+                battleResultElement.classList.add('computer-win');
+            } else {
+                battleWinnerElement.textContent = '🤝 Égalité - Aucun point';
+                battleResultElement.classList.add('draw');
+            }
         }
 
         function resetBattleDisplay() {
-            // Section bataille supprimée - fonction désactivée pour éviter les erreurs
-            console.log('Réinitialisation de la bataille');
+            // Réinitialiser les gestes
+            document.getElementById('player-battle-emoji').textContent = '❓';
+            document.getElementById('player-battle-name').textContent = '-';
+            
+            document.getElementById('computer-battle-emoji').textContent = '❓';
+            document.getElementById('computer-battle-name').textContent = '-';
+            
+            // Réinitialiser le résultat
+            const battleResultElement = document.getElementById('battle-result');
+            const battleWinnerElement = document.getElementById('battle-winner');
+            
+            battleResultElement.className = 'battle-result';
+            battleWinnerElement.textContent = 'En attente du round...';
         }
 
         function showRoundResult(data) {
@@ -488,38 +512,44 @@
                 updateGameState(); // Recharger l'état du jeu
                 
                 setTimeout(() => {
+                    console.log('🔄 Vérification après round - gameOver:', isGameOver(), 'autoRounds:', autoRoundsEnabled);
+                    
                     if (isGameOver()) {
+                        console.log('🏁 Partie terminée, arrêt des rounds automatiques');
                         checkGameOver();
-                    } else {
-                        // Préparer et lancer automatiquement le prochain round si activé
-                        if (autoRoundsEnabled) {
-                            statusElement.textContent = `Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
-                            statusElement.style.color = '#74b9ff';
-                            roundInfo.style.display = 'none';
+                    } else if (autoRoundsEnabled) {
+                        console.log('🚀 Lancement du prochain round automatique');
+                        statusElement.textContent = `Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
+                        statusElement.style.color = '#74b9ff';
+                        roundInfo.style.display = 'block';
+                        
+                        // Compte à rebours visuel avant le prochain round
+                        let countdown = 3;
+                        nextRoundCountdown = setInterval(() => {
+                            roundInfo.textContent = `Prochain round dans ${countdown} seconde${countdown > 1 ? 's' : ''} !`;
+                            statusElement.textContent = `Prochain round dans ${countdown} seconde${countdown > 1 ? 's' : ''} !`;
+                            countdown--;
                             
-                            // Compte à rebours visuel avant le prochain round
-                            let countdown = 3;
-                            nextRoundCountdown = setInterval(() => {
-                                statusElement.textContent = `Prochain round dans ${countdown} seconde${countdown > 1 ? 's' : ''} !`;
-                                countdown--;
-                                
-                                if (countdown < 0) {
-                                    clearInterval(nextRoundCountdown);
-                                    if (!isGameOver() && autoRoundsEnabled) {
-                                        startGameRound();
-                                    }
+                            if (countdown < 0) {
+                                clearInterval(nextRoundCountdown);
+                                if (!isGameOver() && autoRoundsEnabled) {
+                                    console.log('⏰ Lancement du round suivant');
+                                    startGameRound();
+                                } else {
+                                    console.log('❌ Conditions non remplies pour le round suivant');
                                 }
-                            }, 1000);
-                        } else {
-                            // Mode manuel - réafficher le bouton play
-                            playButton.style.display = 'inline-block';
-                            playButton.disabled = false;
-                            playButton.classList.remove('disabled');
-                            playButton.textContent = '🚀 Démarrer les rounds automatiques';
-                            statusElement.textContent = `Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
-                            statusElement.style.color = '#74b9ff';
-                            roundInfo.style.display = 'none';
-                        }
+                            }
+                        }, 1000);
+                    } else {
+                        console.log('⏸️ Mode automatique désactivé, affichage du bouton play');
+                        // Mode manuel - réafficher le bouton play
+                        playButton.style.display = 'inline-block';
+                        playButton.disabled = false;
+                        playButton.classList.remove('disabled');
+                        playButton.textContent = '🚀 Démarrer les rounds automatiques';
+                        statusElement.textContent = `Scores: Vous ${gameState.playerScore} - ${gameState.computerScore} IA`;
+                        statusElement.style.color = '#74b9ff';
+                        roundInfo.style.display = 'none';
                     }
                 }, 1000);
             }, 2000);
@@ -533,7 +563,15 @@
         let nextRoundCountdown = null;
 
         function startGameRound() {
-            if (isGameOver() || roundInProgress) {
+            console.log('🎮 startGameRound appelée - gameOver:', isGameOver(), 'roundInProgress:', roundInProgress);
+            
+            if (isGameOver()) {
+                console.log('❌ Jeu terminé, impossible de démarrer un round');
+                return;
+            }
+            
+            if (roundInProgress) {
+                console.log('⚠️ Round déjà en cours, annulation');
                 return;
             }
 
@@ -544,6 +582,7 @@
             // Activer le mode automatique si c'est le premier round
             if (!autoRoundsEnabled) {
                 autoRoundsEnabled = true;
+                console.log('✅ Mode automatique activé');
             }
             
             // Masquer le bouton play et afficher le bouton stop
@@ -554,14 +593,16 @@
             roundInProgress = true;
             detectedGestureForRound = null;
             
-            console.log('🎮 Début du round - roundInProgress:', roundInProgress);
+            console.log('🎮 Début du round - roundInProgress:', roundInProgress, 'autoRounds:', autoRoundsEnabled);
 
             // Activer la caméra automatiquement si pas déjà active
             if (!cameraActive) {
+                console.log('📹 Activation de la caméra...');
                 toggleCamera();
                 // Attendre un peu que la caméra se lance
                 setTimeout(() => startCountdown(), 500);
             } else {
+                console.log('📹 Caméra déjà active, démarrage du countdown');
                 startCountdown();
             }
         }
@@ -593,6 +634,8 @@
         }
 
         function finishRound() {
+            console.log('🏁 finishRound appelée');
+            
             // Nettoyer le timeout s'il existe
             if (gestureDetectionTimeout) {
                 clearTimeout(gestureDetectionTimeout);
@@ -618,9 +661,12 @@
                 console.log('✅ Geste utilisé pour le round:', playerGesture);
             }
             
+            // IMPORTANT : Marquer le round comme terminé AVANT d'appeler playRound
+            roundInProgress = false;
+            console.log('🔄 Round marqué comme terminé - roundInProgress:', roundInProgress);
+            
             // Jouer le round
             playRound(playerGesture);
-            roundInProgress = false;
         }
 
         // Modifier la fonction de détection pour capturer le geste pendant le round

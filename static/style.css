@@ -17,22 +17,20 @@ body {
 }
 
 .container {
-    max-width: 100%;
-    margin: 0;
-    padding: 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
     position: relative;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 h1 {
     text-align: center;
     color: white;
-    margin-bottom: 15px;
-    font-size: 2.5em;
+    margin-bottom: 30px;
+    font-size: 4em;
     font-weight: 800;
     text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: titleFloat 6s ease-in-out infinite;
     background: linear-gradient(45deg, #ffffff, #a8edea);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -55,46 +53,36 @@ h1 {
     to { text-shadow: 2px 2px 20px rgba(255,255,255,0.5); }
 }
 
-.header {
-    flex-shrink: 0;
-    padding: 5px 0;
-}
-
-/* Layout avec 3 panneaux pleine largeur */
+/* Layout avec 3 panneaux */
 .game-layout {
     display: grid;
-    grid-template-columns: 1fr 1.8fr 1fr;
-    gap: 10px;
-    height: calc(100vh - 100px);
-    width: 100%;
-    padding: 0 5px;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 .game-board {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.15);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255,255,255,0.3);
     position: relative;
     overflow: hidden;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
 /* Panel historique */
 .history-panel {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 15px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255,255,255,0.3);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    height: fit-content;
+    min-height: 600px;
 }
 
 .history-panel h3 {
@@ -110,14 +98,13 @@ h1 {
 /* Panel des gestes détectés */
 .gestures-panel {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 15px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255,255,255,0.3);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    height: fit-content;
+    min-height: 600px;
 }
 
 .gestures-header h3 {
@@ -405,8 +392,8 @@ h1 {
 .scores {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
-    gap: 15px;
+    margin-bottom: 30px;
+    gap: 20px;
 }
 
 .score-card {
@@ -487,21 +474,16 @@ h1 {
 
 .camera-container {
     position: relative;
-    display: flex;
-    justify-content: center;
+    display: inline-block;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    margin: 10px 0;
-    flex: 1;
+    margin: 20px 0;
 }
 
 #video {
-    width: 100%;
-    max-width: 500px;
+    max-width: 100%;
     height: auto;
-    max-height: 350px;
-    object-fit: cover;
     display: block;
     transform: scaleX(-1);
 }
@@ -629,25 +611,19 @@ h1 {
 }
 
 .play-button {
-    font-size: 1.2em;
-    padding: 12px 20px;
+    font-size: 1.8em;
+    padding: 20px 40px;
     background: linear-gradient(135deg, #00b894, #55a3ff);
     color: white;
     border: none;
     border-radius: 15px;
     cursor: pointer;
     font-weight: bold;
-    margin: 10px 0;
-    display: inline-block;
-    max-width: 90%;
-    width: auto;
+    margin: 20px auto;
+    display: block;
     box-shadow: 0 8px 20px rgba(0, 184, 148, 0.3);
     transition: all 0.3s ease;
     animation: playButtonGlow 2s ease-in-out infinite alternate;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .play-button:hover:not(.disabled) {
@@ -673,24 +649,18 @@ h1 {
 }
 
 .stop-button {
-    font-size: 1.2em;
-    padding: 12px 20px;
+    font-size: 1.4em;
+    padding: 15px 30px;
     background: linear-gradient(135deg, #e17055, #d63031);
     color: white;
     border: none;
     border-radius: 12px;
     cursor: pointer;
     font-weight: bold;
-    margin: 5px 0;
-    display: inline-block;
-    max-width: 90%;
-    width: auto;
+    margin: 10px auto;
+    display: block;
     box-shadow: 0 6px 16px rgba(225, 112, 85, 0.3);
     transition: all 0.3s ease;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .stop-button:hover {
@@ -701,11 +671,7 @@ h1 {
 
 .controls {
     text-align: center;
-    margin: 15px 0;
-    padding: 0 10px;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
+    margin: 10px 0;
 }
 
 .game-status {
@@ -738,8 +704,8 @@ h1 {
 }
 
 .control-group {
-    margin: 15px 0;
-    padding: 20px;
+    margin: 10px 0;
+    padding: 15px;
     background: rgba(255,255,255,0.1);
     border-radius: 15px;
     backdrop-filter: blur(5px);
@@ -883,28 +849,6 @@ h1 {
     .control-group {
         padding: 15px;
         margin: 15px 0;
-    }
-}
-
-/* Responsive design pour maximiser l'utilisation de l'espace */
-@media (max-width: 1200px) {
-    .game-layout {
-        grid-template-columns: 0.8fr 2fr 0.8fr;
-        gap: 8px;
-    }
-}
-
-@media (max-width: 900px) {
-    .game-layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-        height: auto;
-        gap: 10px;
-    }
-    
-    .container {
-        height: auto;
-        min-height: 100vh;
     }
 }
 
