@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Shifumi AI - Jeu de Pierre-Feuille-Ciseaux</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🎮 Shifumi AI</h1>
+        </div>
+
+        <div class="game-board">
+            <div class="scores">
+                <div class="score-card player-score">
+                    <div class="score-label">👤 Vous</div>
+                    <div class="score-number" id="player-score">0</div>
+                </div>
+                <div class="score-card computer-score">
+                    <div class="score-label">🤖 IA</div>
+                    <div class="score-number" id="computer-score">0</div>
+                </div>
+            </div>
+
+            <div id="game-status" class="game-status">Premier à 5 points gagne !</div>
+            <div id="round-info" class="round-info">Faites votre geste devant la caméra...</div>
+
+            <div class="camera-section">
+                <div class="camera-controls">
+                    <button class="btn" onclick="toggleCamera()">📹 Activer Caméra</button>
+                    <button class="btn danger" onclick="stopCamera()">🛑 Arrêter Caméra</button>
+                </div>
+                
+                <div class="camera-container">
+                    <video id="video" width="640" height="480" autoplay></video>
+                    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+                    <div class="camera-overlay" id="camera-status">Caméra inactive</div>
+                </div>
+            </div>
+
+            <div class="gesture-info">
+                <div class="current-gesture" id="current-gesture">En attente...</div>
+                <div class="gesture-feedback" id="gesture-feedback">Aucun geste détecté</div>
+            </div>
+
+            <div class="controls">
+                <button id="play-button" class="play-button" onclick="startGameRound()">🎮 Lancer la partie</button>
+            </div>
+
+            <div class="control-group">
+                <h3>🎯 Comment jouer</h3>
+                <p>1. Activez votre caméra</p>
+                <p>2. Cliquez sur "Lancer la partie"</p>
+                <p>3. Faites votre geste devant la caméra (pierre ✊, papier ✋, ciseaux ✌️)</p>
+                <p>4. Premier à 5 points gagne !</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <script>
+        // Variables globales
+        const socket = io();
+        let cameraActive = false;
+        let stream = null;
+        let detectionInterval = null;
+        
+        // Gestionnaire d'état du jeu
+        let gameState = {
+            playerScore: 0,
+            computerScore: 0,
+            gameWinner: null
+        };
+
+        // Correspondance gestes-emojis
+        const gestureEmojis = {
+            'pierre': '✊',
+            'papier': '✋',
+            'ciseaux': '✌️',
+            'aucun': '❓',
+            'erreur': '❌'
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            updateGameState();
+            
+            // Charger l'état du jeu au démarrage
+            fetch('/api/game/state')
+                .then(response => response.json())
+                .then(data => {
+                    gameState = data;
+                    updateScoreDisplay();
+                    checkGameOver();
+                })
+                .catch(error => console.error('Erreur lors du chargement de l\'état du jeu:', error));
+        });
+
+        // Animation des particules
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            const numParticles = 50;
+            
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                particles.appendChild(particle);
+            }
+        }
+
+        // Gestion de la caméra
+        async function toggleCamera() {
+            if (!cameraActive) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: 640, 
+                            height: 480,
+                            facingMode: 'user' 
+                        } 
+                    });
+                    document.getElementById('video').srcObject = stream;
+                    cameraActive = true;
+                    document.getElementById('camera-status').textContent = 'Caméra active';
+                    
+                    // Démarrer la détection de gestes
+                    startGestureDetection();
+                    console.log('Caméra activée et détection démarrée');
+                } catch (error) {
+                    console.error('Erreur d\'accès à la caméra:', error);
+                    alert('Impossible d\'accéder à la caméra. Vérifiez les permissions.');
+                }
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                document.getElementById('video').srcObject = null;
+                cameraActive = false;
+                document.getElementById('camera-status').textContent = 'Caméra inactive';
+                
+                // Arrêter la détection de gestes
+                stopGestureDetection();
+                console.log('Caméra arrêtée et détection stoppée');
+            }
+        }
+
+        function startGestureDetection() {
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+            }
+            
+            detectionInterval = setInterval(() => {
+                if (cameraActive) {
+                    captureAndDetectGesture();
+                }
+            }, 200); // Capture toutes les 200ms
+        }
+
+        function stopGestureDetection() {
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+                detectionInterval = null;
+            }
+        }
+
+        function captureAndDetectGesture() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Capturer l'image de la vidéo
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convertir en base64
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Envoyer au serveur pour détection
+            socket.emit('detect_gesture', { image: imageData });
+        }
+
+        // Gestion du jeu
+        function updateGameState() {
+            fetch('/api/game/state')
+                .then(response => response.json())
+                .then(data => {
+                    gameState = data;
+                    updateScoreDisplay();
+                })
+                .catch(error => console.error('Erreur:', error));
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('player-score').textContent = gameState.playerScore;
+            document.getElementById('computer-score').textContent = gameState.computerScore;
+        }
+
+        function playRound(playerGesture) {
+            if (isGameOver()) {
+                console.log('Jeu terminé, impossible de jouer');
+                return;
+            }
+
+            console.log('Jeu d\'un round avec geste:', playerGesture);
+            
+            fetch('/play', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ gesture: playerGesture })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Résultat du round:', data);
+                updateScoreDisplay();
+                showRoundResult(data);
+                checkGameOver();
+            })
+            .catch(error => console.error('Erreur:', error));
+        }
+
+        function showRoundResult(data) {
+            const resultText = data.result === 'draw' ? 'Égalité' : 
+                              data.result === 'player' ? 'Vous gagnez' : 'IA gagne';
+            
+            const message = `${resultText} ! ${gestureEmojis[data.player_gesture]} vs ${gestureEmojis[data.computer_gesture]}`;
+            
+            // Afficher temporairement le résultat
+            const statusElement = document.getElementById('game-status');
+            const originalText = statusElement.textContent;
+            statusElement.textContent = message;
+            statusElement.style.color = data.result === 'player' ? '#00b894' : 
+                                       data.result === 'computer' ? '#e17055' : '#ffeaa7';
+            
+            setTimeout(() => {
+                statusElement.textContent = originalText;
+                statusElement.style.color = '#74b9ff';
+            }, 2000);
+
+            // Réactiver le bouton après le round
+            setTimeout(() => {
+                const playButton = document.getElementById('play-button');
+                playButton.disabled = false;
+                playButton.classList.remove('disabled');
+                playButton.textContent = '🎮 Lancer la partie';
+                document.getElementById('round-info').style.display = 'none';
+            }, 3000);
+        }
+
+        let roundInProgress = false;
+        let gestureDetectionTimeout = null;
+
+        function startGameRound() {
+            if (isGameOver() || roundInProgress) {
+                return;
+            }
+
+            const playButton = document.getElementById('play-button');
+            const roundInfo = document.getElementById('round-info');
+            
+            // Désactiver le bouton et changer le texte
+            playButton.disabled = true;
+            playButton.classList.add('disabled');
+            playButton.textContent = '⏳ En attente de votre geste...';
+            roundInfo.style.display = 'block';
+            roundInProgress = true;
+
+            // Activer la caméra automatiquement si pas déjà active
+            if (!cameraActive) {
+                toggleCamera();
+            }
+
+            // Attendre un geste pendant 10 secondes
+            gestureDetectionTimeout = setTimeout(() => {
+                if (roundInProgress) {
+                    // Timeout - jouer aléatoirement
+                    const randomGestures = ['pierre', 'papier', 'ciseaux'];
+                    const randomGesture = randomGestures[Math.floor(Math.random() * randomGestures.length)];
+                    
+                    console.log('Timeout - geste aléatoire:', randomGesture);
+                    playRound(randomGesture);
+                    roundInProgress = false;
+                }
+            }, 10000);
+        }
+
+        // Modifier la fonction de détection pour auto-jouer
+        function handleGestureDetected(gesture) {
+            if (roundInProgress && gesture !== 'aucun' && gesture !== 'erreur') {
+                clearTimeout(gestureDetectionTimeout);
+                console.log('Geste détecté pendant le round:', gesture);
+                playRound(gesture);
+                roundInProgress = false;
+            }
+        }
+
+        function isGameOver() {
+            return gameState.gameWinner !== null;
+        }
+
+        function checkGameOver() {
+            if (gameState.gameWinner) {
+                const winnerText = gameState.gameWinner === 'player' ? 
+                    '🎉 Félicitations ! Vous avez gagné !' : 
+                    '😔 L\'IA a gagné ! Réessayez !';
+                
+                document.getElementById('game-status').innerHTML = `
+                    <div style="font-size: 1.5em; margin-bottom: 15px;">${winnerText}</div>
+                    <button onclick="resetGame()" class="btn" style="font-size: 1.2em; padding: 12px 25px;">
+                        🔄 Nouvelle partie
+                    </button>
+                `;
+                
+                // Désactiver le bouton de jeu
+                const playButton = document.getElementById('play-button');
+                playButton.disabled = true;
+                playButton.classList.add('disabled');
+                playButton.textContent = 'Jeu terminé';
+            }
+        }
+
+        function resetGame() {
+            fetch('/reset', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    gameState = data;
+                    updateScoreDisplay();
+                    document.getElementById('game-status').textContent = 'Premier à 5 points gagne !';
+                    document.getElementById('game-status').style.color = '#74b9ff';
+                    
+                    // Réactiver le bouton de jeu
+                    const playButton = document.getElementById('play-button');
+                    playButton.disabled = false;
+                    playButton.classList.remove('disabled');
+                    playButton.textContent = '🎮 Lancer la partie';
+                    
+                    document.getElementById('round-info').style.display = 'none';
+                    console.log('Jeu réinitialisé');
+                })
+                .catch(error => console.error('Erreur lors de la réinitialisation:', error));
+        }
+
+        // Communication WebSocket
+        socket.on('connect', function() {
+            console.log('Connecté au serveur via WebSocket');
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Déconnecté du serveur');
+        });
+
+        // Écouter la détection de gestes
+        socket.on('gesture_detected', function(data) {
+            console.log('Geste détecté via socket:', data);
+            updateDetectedHand(data.gesture, data.hand_detected);
+            
+            // Si un geste valide est détecté et que le jeu n'est pas terminé
+            if (data.gesture !== 'aucun' && data.gesture !== 'erreur' && !isGameOver()) {
+                document.getElementById('gesture-feedback').textContent = 
+                    `Geste détecté: ${data.gesture.toUpperCase()} ${gestureEmojis[data.gesture]}`;
+                
+                // Auto-jouer si un round est en cours
+                handleGestureDetected(data.gesture);
+            }
+        });
+
+        function updateDetectedHand(gesture, handDetected) {
+            const currentGestureElement = document.getElementById('current-gesture');
+            
+            if (handDetected) {
+                currentGestureElement.textContent = `Main détectée: ${gesture.toUpperCase()} ${gestureEmojis[gesture]}`;
+                currentGestureElement.style.background = 'linear-gradient(135deg, #00b894, #55a3ff)';
+            } else {
+                currentGestureElement.textContent = 'Aucune main détectée';
+                currentGestureElement.style.background = 'linear-gradient(135deg, #636e72, #2d3436)';
+            }
+        }
+
+        // Gestion des erreurs
+        window.addEventListener('error', function(event) {
+            console.error('Erreur JavaScript:', event.error);
+        });
+
+        // Nettoyage lors de la fermeture de la page
+        window.addEventListener('beforeunload', function() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            stopGestureDetection();
+        });
+    </script>
+</body>
+</html>

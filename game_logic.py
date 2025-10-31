@@ -20,18 +20,18 @@ def finger_up(landmarks, tip, mcp, ip=None):
 
 def detect_sign(landmarks, is_right_hand=True):
     """
-    Détecte le signe (pierre, feuille, ciseaux) à partir des points de repère de la main.
+    Détecte le signe (pierre, papier, ciseaux) à partir des points de repère de la main.
     
     Args:
         landmarks: Liste des points de repère de la main
         is_right_hand: True si c'est la main droite, False si c'est la main gauche
     
     Returns:
-        str: "pierre", "feuille", "ciseaux" ou "inconnu"
+        str: "pierre", "papier", "ciseaux" ou "aucun"
     """
     # Vérification si les landmarks sont valides
     if not landmarks or len(landmarks) < 21:
-        return "inconnu"
+        return "aucun"
 
     fingers = []
     
@@ -71,20 +71,20 @@ def detect_sign(landmarks, is_right_hand=True):
     if num_fingers_up <= 1:
         return "pierre"
     
-    # Feuille : la plupart des doigts levés (4-5 doigts)
+    # Papier : la plupart des doigts levés (4-5 doigts)
     elif num_fingers_up >= 4:
-        return "feuille"
+        return "papier"
     
     # Si aucun signe n'est clairement identifié
-    return "inconnu"
+    return "aucun"
 
 def get_result(player, computer):
     """
     Détermine le gagnant d'une manche.
     
     Args:
-        player: Choix du joueur ("pierre", "feuille" ou "ciseaux")
-        computer: Choix de l'ordinateur ("pierre", "feuille" ou "ciseaux")
+        player: Choix du joueur ("pierre", "papier" ou "ciseaux")
+        computer: Choix de l'ordinateur ("pierre", "papier" ou "ciseaux")
     
     Returns:
         str: "Égalité", "Joueur" ou "Ordinateur"
@@ -92,8 +92,8 @@ def get_result(player, computer):
     if player == computer:
         return "Égalité"
     elif (player == "pierre" and computer == "ciseaux") or \
-         (player == "feuille" and computer == "pierre") or \
-         (player == "ciseaux" and computer == "feuille"):
+         (player == "papier" and computer == "pierre") or \
+         (player == "ciseaux" and computer == "papier"):
         return "Joueur"
     else:
         return "Ordinateur"

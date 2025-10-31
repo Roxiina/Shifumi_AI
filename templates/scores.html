@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Scores - Shifumi AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGradient 3s ease infinite;
+        }
+
+        @keyframes textGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            border: none;
+            color: white;
+            padding: 18px 35px;
+            margin-bottom: 3rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .back-btn:hover::before {
+            left: 100%;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(116, 185, 255, 0.4);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .scores-table {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            border-radius: 25px;
+            padding: 3rem;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 60px rgba(0,0,0,0.2);
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        th, td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffeaa7;
+        }
+
+        tr {
+            transition: all 0.3s ease;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.01);
+        }
+
+        .winner-cell {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .winner-joueur {
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .winner-ordinateur {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .no-scores {
+            text-align: center;
+            font-size: 1.8rem;
+            margin: 4rem 0;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        details {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        summary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        details ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        details li {
+            margin: 0.5rem 0;
+            font-weight: 500;
+        }
+
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            th, td {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .scores-table {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">🏠 Retour au jeu</a>
+        
+        <h1>📊 Historique des Scores</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_games }}</div>
+                <div class="stat-label">Parties jouées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.player_wins }}</div>
+                <div class="stat-label">Victoires</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.computer_wins }}</div>
+                <div class="stat-label">Défaites</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.win_rate }}%</div>
+                <div class="stat-label">Taux de victoire</div>
+            </div>
+        </div>
+
+        {% if scores %}
+        <div class="scores-table">
+            <h2>🏆 Historique détaillé</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Gagnant</th>
+                        <th>Score Joueur</th>
+                        <th>Score IA</th>
+                        <th>Total Rounds</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for score in scores %}
+                    <tr>
+                        <td>{{ score.date[:19].replace('T', ' ') }}</td>
+                        <td class="winner-cell {{ 'winner-joueur' if score.winner == 'Joueur' else 'winner-ordinateur' }}">
+                            {{ score.winner }}
+                        </td>
+                        <td>{{ score.player_score }}</td>
+                        <td>{{ score.computer_score }}</td>
+                        <td>{{ score.total_rounds }}</td>
+                        <td>
+                            <details>
+                                <summary>Voir les rounds</summary>
+                                <ul>
+                                    {% for round in score.game_details %}
+                                    <li>
+                                        <strong>Round {{ round.round }}:</strong>
+                                        {{ round.player_gesture }} vs {{ round.computer_gesture }}
+                                        ({{ 'Victoire' if round.result == 'player' else 'Défaite' if round.result == 'computer' else 'Égalité' }})
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="no-scores">
+                <p>Aucune partie jouée pour le moment.</p>
+                <p>Commencez à jouer pour voir vos scores ici !</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Animation des particules flottantes
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Taille aléatoire
+            const size = Math.random() * 8 + 4;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            
+            // Position horizontale aléatoire
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            
+            // Couleur aléatoire avec des tons pastel
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Durée d'animation aléatoire
+            particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+            
+            document.body.appendChild(particle);
+            
+            // Supprimer la particule après l'animation
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 25000);
+        }
+
+        // Créer des particules à intervalles réguliers
+        setInterval(createParticle, 500);
+        
+        // Créer quelques particules au chargement
+        for (let i = 0; i < 10; i++) {
+            setTimeout(createParticle, i * 200);
+        }
+    </script>
+</body>
+</html>

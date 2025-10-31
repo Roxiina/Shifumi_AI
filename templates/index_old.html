@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Shifumi AI - Jeu de Pierre-Feuille-Ciseaux</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGradient 3s ease infinite;
+        }
+
+        @keyframes textGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 300px 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .player-section, .computer-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 60px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-section::before, .computer-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .player-section:hover::before, .computer-section:hover::before {
+            transform: translateX(100%);
+        }
+
+        .player-section:hover, .computer-section:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+        }
+
+        .vs-section {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ffeaa7;
+            text-shadow: 0 0 20px rgba(255, 234, 167, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #ffeaa7;
+        }
+
+        .gesture-display {
+            font-size: 8rem;
+            margin: 1rem 0;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+            transition: all 0.3s ease;
+        }
+
+        .gesture-display.winner {
+            animation: winnerGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes winnerGlow {
+            0% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)) scale(1); }
+            100% { filter: drop-shadow(0 0 40px rgba(255,255,255,0.8)) scale(1.1); }
+        }
+
+        .score {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 1rem 0;
+            color: #00ff88;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .controls {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .gesture-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .gesture-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            min-width: 100px;
+        }
+
+        .gesture-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .gesture-btn:hover::before {
+            left: 100%;
+        }
+
+        .gesture-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .gesture-btn:active {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .info-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #4ecdc4;
+        }
+
+        .info-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            border: none;
+            color: white;
+            padding: 18px 35px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn.secondary {
+            background: linear-gradient(45deg, #a29bfe, #6c5ce7);
+            box-shadow: 0 8px 25px rgba(162, 155, 254, 0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(116, 185, 255, 0.4);
+        }
+
+        .camera-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #video {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 100%;
+            height: auto;
+        }
+
+        .countdown-display {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #ff6b6b;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            margin: 2rem 0;
+            animation: countdownPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes countdownPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .result-display {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        .result-win {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .result-lose {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .result-draw {
+            background: rgba(255, 234, 167, 0.2);
+            color: #ffeaa7;
+            border: 2px solid rgba(255, 234, 167, 0.3);
+        }
+
+        .match-info {
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .match-progress {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .match-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .match-indicator.won {
+            background: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .match-indicator.lost {
+            background: #ff6b6b;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+        }
+
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 3rem;
+            }
+            
+            .game-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .gesture-display {
+                font-size: 5rem;
+            }
+            
+            .gesture-buttons {
+                gap: 1rem;
+            }
+            
+            .gesture-btn {
+                padding: 1rem 1.5rem;
+                font-size: 2rem;
+                min-width: 80px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🎮 SHIFUMI AI</h1>
+            <p class="subtitle">Jeu de Pierre-Feuille-Ciseaux avec Intelligence Artificielle</p>
+        </div>
+
+        <div class="game-container">
+            <div class="player-section">
+                <h2 class="section-title">👤 Vous</h2>
+                <div class="gesture-display" id="playerGesture">❓</div>
+                <div class="score" id="playerScore">0</div>
+            </div>
+
+            <div class="vs-section">VS</div>
+
+            <div class="computer-section">
+                <h2 class="section-title">🤖 IA</h2>
+                <div class="gesture-display" id="computerGesture">❓</div>
+                <div class="score" id="computerScore">0</div>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div class="info-card">
+                <div class="info-value" id="currentRound">0</div>
+                <div class="info-label">Round Actuel</div>
+            </div>
+            <div class="info-card">
+                <div class="info-value" id="currentMatch">1</div>
+                <div class="info-label">Manche</div>
+            </div>
+            <div class="info-card">
+                <div class="info-value" id="playerMatches">0</div>
+                <div class="info-label">Vos Manches</div>
+            </div>
+            <div class="info-card">
+                <div class="info-value" id="computerMatches">0</div>
+                <div class="info-label">Manches IA</div>
+            </div>
+        </div>
+
+        <div class="match-info">
+            <div class="match-progress">
+                <div class="match-indicator" id="match1"></div>
+                <div class="match-indicator" id="match2"></div>
+                <div class="match-indicator" id="match3"></div>
+            </div>
+            <p>Premier à 2 manches remporte la partie</p>
+        </div>
+
+        <div class="controls">
+            <div class="countdown-display" id="countdown" style="display: none;"></div>
+            <div class="result-display" id="result" style="display: none;"></div>
+            
+            <div class="gesture-buttons">
+                <button class="gesture-btn" onclick="playRound('pierre')">✊</button>
+                <button class="gesture-btn" onclick="playRound('papier')">✋</button>
+                <button class="gesture-btn" onclick="playRound('ciseaux')">✌️</button>
+            </div>
+        </div>
+
+        <div class="camera-section" id="cameraSection" style="display: none;">
+            <h3>📷 Détection de gestes par caméra</h3>
+            <video id="video" width="640" height="480" autoplay></video>
+            <canvas id="canvas" style="display: none;"></canvas>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn" onclick="toggleCamera()">📷 Caméra</button>
+            <button class="btn secondary" onclick="resetGame()">🔄 Nouveau Jeu</button>
+            <a href="/scores" class="btn secondary">📊 Scores</a>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let cameraActive = false;
+        let lastPlayTime = 0;
+        const PLAY_COOLDOWN = 5000; // 5 secondes
+
+        // Gestion de l'état du jeu
+        let gameState = {
+            player_score: 0,
+            computer_score: 0,
+            current_round: 0,
+            current_match: 1,
+            player_matches_won: 0,
+            computer_matches_won: 0,
+            game_over: false
+        };
+
+        // Émojis pour les gestes
+        const gestureEmojis = {
+            'pierre': '✊',
+            'papier': '✋',
+            'ciseaux': '✌️',
+            'aucun': '❓'
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+            checkGameState();
+        });
+
+        // Écouter les mises à jour de l'état du jeu
+        socket.on('game_state', function(state) {
+            gameState = state;
+            updateDisplay();
+        });
+
+        // Gestion de la détection de gestes
+        socket.on('gesture_detected', function(data) {
+            if (data.gesture !== 'aucun' && data.gesture !== 'erreur') {
+                playRound(data.gesture);
+            }
+        });
+
+        function updateDisplay() {
+            // Mettre à jour les scores
+            document.getElementById('playerScore').textContent = gameState.player_score;
+            document.getElementById('computerScore').textContent = gameState.computer_score;
+            
+            // Mettre à jour les informations de partie
+            document.getElementById('currentRound').textContent = gameState.current_round;
+            document.getElementById('currentMatch').textContent = gameState.current_match;
+            document.getElementById('playerMatches').textContent = gameState.player_matches_won;
+            document.getElementById('computerMatches').textContent = gameState.computer_matches_won;
+            
+            // Mettre à jour les indicateurs de manches
+            updateMatchIndicators();
+            
+            // Afficher le dernier résultat si disponible
+            if (gameState.last_result) {
+                document.getElementById('playerGesture').textContent = 
+                    gestureEmojis[gameState.last_result.player_gesture] || '❓';
+                document.getElementById('computerGesture').textContent = 
+                    gestureEmojis[gameState.last_result.computer_gesture] || '❓';
+                
+                showResult(gameState.last_result.result);
+            }
+        }
+
+        function updateMatchIndicators() {
+            const indicators = ['match1', 'match2', 'match3'];
+            indicators.forEach((id, index) => {
+                const element = document.getElementById(id);
+                element.className = 'match-indicator';
+                
+                if (index < gameState.player_matches_won) {
+                    element.classList.add('won');
+                } else if (index < gameState.computer_matches_won) {
+                    element.classList.add('lost');
+                }
+            });
+        }
+
+        function playRound(gesture) {
+            // Vérifier le cooldown
+            const now = Date.now();
+            if (now - lastPlayTime < PLAY_COOLDOWN) {
+                const remaining = Math.ceil((PLAY_COOLDOWN - (now - lastPlayTime)) / 1000);
+                showCountdown(remaining);
+                return;
+            }
+
+            if (gameState.game_over) {
+                alert('Partie terminée ! Cliquez sur "Nouveau Jeu" pour recommencer.');
+                return;
+            }
+
+            lastPlayTime = now;
+
+            // Envoyer la requête au serveur
+            fetch('/api/game/play', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ gesture: gesture })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    gameState = data.game_state;
+                    updateDisplay();
+                    
+                    if (gameState.game_over) {
+                        setTimeout(() => {
+                            const winner = gameState.player_matches_won > gameState.computer_matches_won ? 'Vous' : 'L\'IA';
+                            alert(`🎉 Partie terminée ! ${winner} avez gagné !`);
+                        }, 1000);
+                    }
+                } else if (data.status === 'wait') {
+                    showCountdown(Math.ceil(data.time_remaining));
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+        }
+
+        function showResult(result) {
+            const resultElement = document.getElementById('result');
+            resultElement.style.display = 'block';
+            
+            let message, className;
+            if (result === 'Gagné') {
+                message = '🎉 Vous avez gagné !';
+                className = 'result-win';
+            } else if (result === 'Perdu') {
+                message = '😔 Vous avez perdu !';
+                className = 'result-lose';
+            } else {
+                message = '🤝 Égalité !';
+                className = 'result-draw';
+            }
+            
+            resultElement.textContent = message;
+            resultElement.className = 'result-display ' + className;
+            
+            setTimeout(() => {
+                resultElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showCountdown(seconds) {
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.style.display = 'block';
+            countdownElement.textContent = `⏱️ ${seconds}s`;
+            
+            if (seconds > 0) {
+                setTimeout(() => showCountdown(seconds - 1), 1000);
+            } else {
+                countdownElement.style.display = 'none';
+            }
+        }
+
+        function resetGame() {
+            fetch('/api/game/reset', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Reset de l'affichage
+                    gameState = {
+                        player_score: 0,
+                        computer_score: 0,
+                        current_round: 0,
+                        current_match: 1,
+                        player_matches_won: 0,
+                        computer_matches_won: 0,
+                        game_over: false
+                    };
+                    
+                    document.getElementById('playerGesture').textContent = '❓';
+                    document.getElementById('computerGesture').textContent = '❓';
+                    document.getElementById('result').style.display = 'none';
+                    
+                    updateDisplay();
+                    lastPlayTime = 0;
+                }
+            });
+        }
+
+        function checkGameState() {
+            fetch('/api/game/state')
+            .then(response => response.json())
+            .then(data => {
+                gameState = data;
+                updateDisplay();
+            });
+        }
+
+        function toggleCamera() {
+            const cameraSection = document.getElementById('cameraSection');
+            
+            if (!cameraActive) {
+                startCamera();
+                cameraSection.style.display = 'block';
+                cameraActive = true;
+            } else {
+                stopCamera();
+                cameraSection.style.display = 'none';
+                cameraActive = false;
+            }
+        }
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                // Capturer et envoyer des images pour détection
+                setInterval(() => {
+                    if (cameraActive) {
+                        captureAndSend();
+                    }
+                }, 1000); // Toutes les secondes
+            })
+            .catch(function(err) {
+                console.error('Erreur d\'accès à la caméra:', err);
+                alert('Impossible d\'accéder à la caméra. Vérifiez les permissions.');
+            });
+        }
+
+        function stopCamera() {
+            const video = document.getElementById('video');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        function captureAndSend() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            socket.emit('detect_gesture', { image: imageData });
+        }
+
+        // Animation des particules flottantes
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Taille aléatoire
+            const size = Math.random() * 8 + 4;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            
+            // Position horizontale aléatoire
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            
+            // Couleur aléatoire avec des tons pastel
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Durée d'animation aléatoire
+            particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+            
+            document.body.appendChild(particle);
+            
+            // Supprimer la particule après l'animation
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 25000);
+        }
+
+        // Créer des particules à intervalles réguliers
+        setInterval(createParticle, 500);
+        
+        // Créer quelques particules au chargement
+        for (let i = 0; i < 10; i++) {
+            setTimeout(createParticle, i * 200);
+        }
+    </script>
+</body>
+</html>
