@@ -12,6 +12,23 @@
 </head>
 <body>
     <div class="container">
+        <!-- Boutons de test pour diagnostic -->
+        <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(255,0,0,0.8); padding: 15px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="color: white; font-weight: bold; margin-bottom: 10px; text-align: center;">🔧 TESTS</div>
+            <button onclick="testAutoRounds()" 
+                    style="background: lime; color: black; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; margin: 2px; border-radius: 5px; display: block; width: 100%;">
+                🧪 TEST AUTO ROUNDS
+            </button>
+            <button onclick="debugGameState()" 
+                    style="background: cyan; color: black; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; margin: 2px; border-radius: 5px; display: block; width: 100%;">
+                📊 DEBUG STATE
+            </button>
+            <button onclick="forceNextRound()" 
+                    style="background: orange; color: black; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; margin: 2px; border-radius: 5px; display: block; width: 100%;">
+                ⚡ FORCE ROUND
+            </button>
+        </div>
+        
         <div class="header">
             <h1 class="title">🎮 Shifumi AI</h1>
         </div>
